@@ -1,6 +1,15 @@
-.main{
+/* .main{
     height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
+} */
+.homee{
+    height: 100vh;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* border: 1px solid black; */
+    margin: auto;
 }
