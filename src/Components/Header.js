@@ -1,9 +1,11 @@
 import React from "react";
+import { useProvider } from "./context";
 
 export function Header(props) {
  
+  const {accountAddress} = useProvider()
   
-  let {accountAddress,isLogin} = props
+  let {isLogin} = props
   let result  = true
   // {console.log(accAddress,"accAddress")}
   // {console.log(result,"result")}

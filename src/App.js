@@ -8,17 +8,20 @@ import { Footer } from './Components/Footer';
 import { ProviderApp } from './Components/context';
 
 function App() {
-  const [accountAddress, setAccountAddress] = useState("");
+
+  // const [accountAddress, setAccountAddress] = useState("");
 
   
   return (
+    <ProviderApp>
     <div className="App">
       <Router>
     <Routes>
-      <Route path='/' element={[<Header accountAddress={accountAddress} />,<Home setAccountAddress={setAccountAddress} accountAddress={accountAddress}/>,<Footer/>]} />
+      <Route path='/' element={[<Header  />,<Home />,<Footer/>]} />
     </Routes>
   </Router>
     </div>
+    </ProviderApp>
   );
 }
 

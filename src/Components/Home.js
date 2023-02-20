@@ -10,21 +10,25 @@ import StellarSdk, {
   Asset,
   Keypair,
 } from "stellar-sdk";
+import { useProvider } from "./context";
 
 import { CardPayment } from "./Modal/CardPayment";
+import { encrypt } from "openpgp";
 
+import { API_BASE_URL } from "../Api";
 // const StellarSdk = require('stellar-sdk');
 const server = new StellarSdk.Server("https://horizon-testnet.stellar.org/");
 
 export const Home = (props) => {
+    const {setAccountAddress,accountAddress}  = useProvider()
+
     const [show,setShow] = useState(false)
 
-    const {setAccountAddress,accountAddress} = props
-//   const [accountAddress, setAccountAddress] = useState("");
   const [accountBalance, setAccountBalance] = useState(0);
   const [anchorAddress, setAnchorAddress] = useState("");
 
   const [beneficiary, setBeneficiary] = useState("");
+
 
   async function createAccount() {
     const pair1 = StellarSdk.Keypair.random();
@@ -41,7 +45,7 @@ export const Home = (props) => {
     await CheckBalance(_Address);
   }
 
-  async function CheckBalance(accountAddress) {
+  const CheckBalance = async (accountAddress)=> {
     const CheckBalance = await axios.get(
       `https://horizon-testnet.stellar.org/accounts/${accountAddress}`
     );
@@ -51,6 +55,9 @@ export const Home = (props) => {
     );
     setAccountBalance(CheckBalance?.data?.balances[0]?.balance);
   }
+
+
+  //build trustline
   async function BuildTrustLIne() {
     const secret = localStorage.getItem("PrivateKey");
     const keypair = Keypair.fromSecret(secret);
@@ -81,7 +88,11 @@ export const Home = (props) => {
     console.log("hurrrraaayyyyy");
 
     return result;
-  }
+  };
+  //ends here 
+
+  
+
   return (<>
     <CardPayment show={show} setShow = {setShow} 
 
