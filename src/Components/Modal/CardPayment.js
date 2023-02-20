@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 // import { Field, Formik } from "formik";
 import axios from "axios";
-import { CREATE_CARD_API, API_KEY, API_BASE_URL, GET_PUB_KEY } from "../../Api";
+import { CREATE_CARD_API, API_KEY, API_BASE_URL, GET_PUB_KEY,CREATE_PAYMENT_API ,GET_PAYMENT_STATUS_PARAMS} from "../../Api";
 import { Form, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { v4 as uuidv4 } from "uuid";
@@ -10,6 +10,8 @@ import { encrypt ,readKey,createMessage} from "openpgp";
 
 export const CardPayment = (props) => {
   const { show, setShow } = props;
+
+  const [payStat,setPayStat] = useState("")
 
   const handleClose = () => {
     setShow(false);
@@ -22,6 +24,8 @@ export const CardPayment = (props) => {
       ...data,
       [e.target.name]: e.target.value,
     });
+
+    console.log(data,"updateData")
   };
 
   //get public key
@@ -55,9 +59,13 @@ export const CardPayment = (props) => {
     // result.publicKey
 
      console.log(result,"result-")
+     console.log(data,"data---")
+
     const payload = {
       idempotencyKey: uuidv4(),
-      amount: 20,
+      amount: data.amount,
+      expMonth:4,
+      expYear:2025,
     //   verification: "cvv",
     //   source: sourceDetails,
     //   description: this.formData.description,
@@ -65,16 +73,26 @@ export const CardPayment = (props) => {
       encryptedData: "",
     //   channel: this.formData.channel,
       metadata: {
-        phoneNumber: +9157887689,
-        email: "gkashyap9602@gmail.com",
+        phoneNumber: data.phone,
+        email: data.email,
         sessionId: "xxx",
         ipAddress: "172.33.222.1",
+      },
+      billingDetails: {
+        name: data.cardholder,
+        city: data.city,
+        country: "US",
+        line1: data.address,
+        postalCode: data.postal,
+        line2: "Suite",
+        district: "MA"
       },
     };
 
     // let cardDetails = "344"
     let cardDetails = {
-        cvv:323
+      number:data.card,
+        cvv:data.cvv
     }
 
     // const encryptedData = await encrypt(cardDetails, result.publicKey)
@@ -82,23 +100,33 @@ export const CardPayment = (props) => {
     // console.log(encryptedData,"encryptedData-")
 
     const decodedPublicKey = await readKey({ armoredKey: atob(result.publicKey) })
-const encrypted = await encrypt({
-    message: await createMessage({ text: 'Hello, World!' }), // input as Message object
+    const encrypted = await encrypt({
+    message: await createMessage({ text: JSON.stringify(cardDetails) }), // input as Message object
     encryptionKeys: decodedPublicKey, // for encryption
+})
+.then((ciphertext)=>{
+  return {
+    encryptedMessage: btoa(ciphertext),
+    keyId:result.keyId,
+  }
 });
+
+payload.encryptedData = encrypted.encryptedMessage
+      payload.keyId = encrypted.keyId
 
 console.log(encrypted,"encrypted")
 
     console.log(payload,"payload--after")
 
-    await axios
-      .get(`${API_BASE_URL}`,payload, {
+    return await axios
+      .post(`${CREATE_CARD_API}`,payload, {
         headers: {
           Authorization: `Bearer ${API_KEY}`,
         },
       })
       .then((res) => {
-        console.log(res, "response get pubkey");
+        console.log(res, "response card created api ");
+        return {response:res.data,payload:payload}
       })
       .catch((err) => {
         console.log(err, "err");
@@ -107,24 +135,79 @@ console.log(encrypted,"encrypted")
   //ends here
 
   //create payment
-  const CreatePayment = (e) => {
+  const CreatePayment = async(e) => {
     e.preventDefault();
-    createCard()
-    // let formdata = {};
+    let result = await createCard()
 
-    // axios.post(`${CREATE_CARD_API}`, {
-    //     headers: {
-    //         Authorization: `Bearer ${API_KEY}`,
-    //     },
-    // })
-    //     .then((res) => {
-    //         console.log(res, "result")
-    //     })
-    //     .catch((err) => {
-    //         console.log(err, "error")
-    //     })
+    console.log(result,"result==")
+    let formdata = {
+      channel:"",
+      idempotencyKey: uuidv4(),
+     keyId: result.payload.keyId,
+     metadata: {
+          "email": "satoshi@circle.com",
+          "phoneNumber": "+14155555555",
+          "sessionId": "DE6FA86F60BB47B379307F851E238617",
+          "ipAddress": "244.28.239.130"
+     },
+     amount: {
+          amount: result.payload.amount,
+          currency: "USD"
+     },
+     verification: "cvv",
+     source: {
+          id: result.response.data.id,
+          "type": "card"
+     },
+     description: "Payment",
+     encryptedData: result.payload.encryptedData
+}
+  
 
-    console.log(data, "data _values");
+   await  axios.post(`${CREATE_PAYMENT_API}`, formdata,{
+        headers: {
+            Authorization: `Bearer ${API_KEY}`,
+        },
+    })
+        .then((res) => {
+            console.log(res, "result payment api ")
+            window.alert("Payment Successful")
+              
+            // if()  
+            console.log(res.data.data, "res.data.id payment api ")
+
+            let interval = setInterval(() => {
+              axios.get(`${GET_PAYMENT_STATUS_PARAMS}/${res.data.data.id}`,{
+                headers: {
+                    Authorization: `Bearer ${API_KEY}`,
+                },
+            })
+              .then((res)=>{
+                    console.log(res,"res")
+                    // setPayStat(res.data.status)
+                    if(res.data.data.status==="paid"){
+                      console.log("under paid")
+                      clearInterval(interval)
+
+                    }
+                    console.log("unpaid")
+              })
+              .catch((err)=>{
+                console.log(err,"err")
+     
+              })
+              
+            }, 1000);
+
+
+
+           
+        })
+        .catch((err) => {
+            console.log(err, "error")
+        })
+
+    // console.log(data, "data _values");
   };
   //   console.log()
   return (
@@ -193,7 +276,7 @@ console.log(encrypted,"encrypted")
                       {/* <Form.Label>Cardholder Name</Form.Label> */}
                       <Form.Control
                         type="name"
-                        name="amount"
+                        name="cardholder"
                         onChange={updateData}
                         placeholder="Cardholder Name"
                       />
