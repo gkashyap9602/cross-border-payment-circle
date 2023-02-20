@@ -81,13 +81,14 @@ export const CardPayment = (props) => {
 
     // console.log(encryptedData,"encryptedData-")
 
-
+    const decodedPublicKey = await readKey({ armoredKey: atob(result.publicKey) })
 const encrypted = await encrypt({
     message: await createMessage({ text: 'Hello, World!' }), // input as Message object
-    encryptionKeys: result.publicKey, // for encryption
+    encryptionKeys: decodedPublicKey, // for encryption
 });
 
 console.log(encrypted,"encrypted")
+
     console.log(payload,"payload--after")
 
     await axios
