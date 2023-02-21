@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { Header } from './Components/Header';
 import { Footer } from './Components/Footer';
 import { ProviderApp } from './Components/context';
+// import { ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 import {WirePayment} from "./Components/WirePayment"
 
@@ -17,6 +19,8 @@ function App() {
   return (
     <ProviderApp>
     <div className="App">
+    {/* <ToastContainer  progressClassName="toastProgress" bodyClassName="toastBody"/> */}
+
       <Router>
     <Routes>
       <Route exact path='/' element={[<Header  />,<Home />,<Footer/>]} />
