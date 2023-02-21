@@ -9,16 +9,16 @@ import { encrypt, readKey, createMessage } from "openpgp";
 import { useProvider } from "../context";
 
 export const WirePaymentModal = (props) => {
-  const { amount,setAmount,show, setShow, sendWireTransaction,trackingId,setTrackingId,cirecleAccountNumber,setCircleAccountNumber} = props;
+  const {data,setData, amount,setAmount,show, setShow, sendWireTransaction,trackingId,setTrackingId,cirecleAccountNumber,setCircleAccountNumber} = props;
 
-  // const updateData = (e) => {
-  //   setData({
-  //     ...data,
-  //     [e.target.name]: e.target.value,
-  //   });
+  const updateData = (e) => {
+    setData({
+      ...data,
+      [e.target.name]: e.target.value,
+    });
 
-  //   console.log(data, "updateData");
-  // };
+    console.log(data, "updateData");
+  };
   const handleClose = () => {
     setShow(false);
   };
@@ -42,8 +42,9 @@ export const WirePaymentModal = (props) => {
             <Form.Group>
               <Form.Label> Amount</Form.Label>
               <Form.Control
-                value={amount}
-                onChange={(e)=>{setAmount(e.target.value)}}
+                value={data.amount}
+                // onChange={(e)=>{setAmount(e.target.value)}}
+                onChange={updateData}
                 name="amount"
                 type="text"
                 placeholder="Enter Amount"
@@ -62,8 +63,9 @@ export const WirePaymentModal = (props) => {
             <Form.Group>
               <Form.Label>Beneficiary Bank Account</Form.Label>
               <Form.Control
-              value={cirecleAccountNumber}
-                onChange={(e)=>{setCircleAccountNumber(e.target.value)}}
+                value={data.benificiary}
+                // onChange={(e)=>{setCircleAccountNumber(e.target.value)}}
+                onChange={updateData}
                 name="benificiary"
                 type="text"
                 placeholder="Enter Beneficiary Bank Account"

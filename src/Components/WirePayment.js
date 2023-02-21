@@ -20,11 +20,11 @@ export const WirePayment = (props) => {
   const [trackingId, setTrackingId] = useState("");
 
   const [accStatus, setAccStatus] = useState();
-  // const [data,setData] = useState({
-  //     amount:"",
-  //     trackRef:"",
-  //     benificiary:""
-  // })
+  const [data,setData] = useState({
+      amount:"",
+      trackRef:"",
+      benificiary:""
+  })
   const [amount, setAmount] = useState("");
   const [show, setShow] = useState(false);
 
@@ -118,11 +118,11 @@ export const WirePayment = (props) => {
       const Payload = {
         trackingRef: trackingId,
         amount: {
-          amount: amount,
+          amount: data.amount,
           currency: "USD",
         },
         beneficiaryBank: {
-          accountNumber: cirecleAccountNumber,
+          accountNumber: data.benificiary,
         },
       };
       const wireTransaction = await axios.post(
@@ -149,6 +149,8 @@ export const WirePayment = (props) => {
   return (
     <>
       <WirePaymentModal
+      data={data}
+      setData={setData}
         setAmount={setAmount}
         amount={amount}
         trackingId={trackingId}
