@@ -10,6 +10,7 @@ export const ProviderApp = ({ children }) => {
   const [accountBalance, setAccountBalance] = useState(0);
   const [show,setShow] = useState(false)
 
+  const [WireAccountId,setWireAccountId] = useState("")
 
   return (
     <GlobalNftContext.Provider
@@ -23,7 +24,9 @@ export const ProviderApp = ({ children }) => {
         accountBalance,
         setAccountBalance,
         setShow,
-        show
+        show,
+        setWireAccountId,
+        WireAccountId
       }}
     >
       {children}

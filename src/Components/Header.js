@@ -3,7 +3,7 @@ import { useProvider } from "./context";
 
 export function Header(props) {
  
-  const {accountAddress,accountBalance} = useProvider()
+  const {accountAddress,accountBalance,WireAccountId} = useProvider()
   
   let {isLogin} = props
   let result  = true
@@ -35,7 +35,12 @@ export function Header(props) {
         {/* <span className="inline-block" >
                       <span style={{fontWeight:"bold",paddingRight:"10px"}}>  {"accBalance"} { "chainName" } </span>  <span>{"accAddress"}</span> 
                       </span> */}
+                      {accountAddress?
            <span> <strong>Steller Account</strong>:- {accountAddress}   <span> <strong> Balance</strong> :- {accountBalance}</span></span>
+           :
+           <span> <strong>Wire Account Id</strong>:- {WireAccountId}   </span>
+           
+           }
          
 
            {/* <button id="connect-me-btn" onClick={props.SignInMetamask} className="btn btn-primary"  >Connect Me</button>  */}
