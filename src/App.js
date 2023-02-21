@@ -7,6 +7,8 @@ import { Header } from './Components/Header';
 import { Footer } from './Components/Footer';
 import { ProviderApp } from './Components/context';
 
+import {WirePayment} from "./Components/WirePayment"
+
 function App() {
 
   // const [accountAddress, setAccountAddress] = useState("");
@@ -17,7 +19,9 @@ function App() {
     <div className="App">
       <Router>
     <Routes>
-      <Route path='/' element={[<Header  />,<Home />,<Footer/>]} />
+      <Route exact path='/' element={[<Header  />,<Home />,<Footer/>]} />
+      <Route path='/wire' element={[<Header  />,<WirePayment />,<Footer/>]} />
+
     </Routes>
   </Router>
     </div>
