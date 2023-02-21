@@ -9,6 +9,8 @@ import { ProviderApp } from './Components/context';
 // import { ToastContainer } from 'react-toastify';
 // import "react-toastify/dist/ReactToastify.css";
 
+import {WirePayment} from "./Components/WirePayment"
+
 function App() {
 
   // const [accountAddress, setAccountAddress] = useState("");
@@ -21,7 +23,9 @@ function App() {
 
       <Router>
     <Routes>
-      <Route path='/' element={[<Header  />,<Home />,<Footer/>]} />
+      <Route exact path='/' element={[<Header  />,<Home />,<Footer/>]} />
+      <Route path='/wire' element={[<Header  />,<WirePayment />,<Footer/>]} />
+
     </Routes>
   </Router>
     </div>
