@@ -7,7 +7,7 @@ import { Header } from './Components/Header';
 import { Footer } from './Components/Footer';
 import { ProviderApp } from './Components/context';
 // import { ToastContainer } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css";
+// import "react-toastify/dist/ReactToastify.css";
 
 function App() {
 
