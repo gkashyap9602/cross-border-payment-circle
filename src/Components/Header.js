@@ -3,7 +3,7 @@ import { useProvider } from "./context";
 
 export function Header(props) {
  
-  const {accountAddress} = useProvider()
+  const {accountAddress,accountBalance} = useProvider()
   
   let {isLogin} = props
   let result  = true
@@ -35,7 +35,9 @@ export function Header(props) {
         {/* <span className="inline-block" >
                       <span style={{fontWeight:"bold",paddingRight:"10px"}}>  {"accBalance"} { "chainName" } </span>  <span>{"accAddress"}</span> 
                       </span> */}
-           <span> Steller Account:- {accountAddress}</span>
+           <span> <strong>Steller Account</strong>:- {accountAddress}   <span> <strong> Balance</strong> :- {accountBalance}</span></span>
+         
+
            {/* <button id="connect-me-btn" onClick={props.SignInMetamask} className="btn btn-primary"  >Connect Me</button>  */}
            </form>: 
            <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">

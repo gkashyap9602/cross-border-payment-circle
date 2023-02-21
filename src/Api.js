@@ -9,9 +9,11 @@ const CREATE_CARD_API = getApiUrl("/v1/cards");
 const GET_PUB_KEY = getApiUrl("/v1/encryption/public");
 const CREATE_PAYMENT_API = getApiUrl("/v1/payments");
 const GET_PAYMENT_STATUS_PARAMS = getApiUrl("/v1/payments");
+const TRANSFER_ASSET = getApiUrl("/v1/transfers");
 
 
 export {
+    TRANSFER_ASSET,
     CREATE_CARD_API,
     GET_PAYMENT_STATUS_PARAMS,
     API_BASE_URL,

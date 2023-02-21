@@ -6,6 +6,9 @@ export const ProviderApp = ({ children }) => {
   const [data, setData] = useState("");
 
   const [accountAddress, setAccountAddress] = useState("");
+  const [beneficiary, setBeneficiary] = useState("");
+  const [accountBalance, setAccountBalance] = useState(0);
+  const [show,setShow] = useState(false)
 
 
   return (
@@ -14,7 +17,13 @@ export const ProviderApp = ({ children }) => {
         data,
         setData,
         accountAddress,
-        setAccountAddress
+        setAccountAddress,
+        beneficiary,
+        setBeneficiary,
+        accountBalance,
+        setAccountBalance,
+        setShow,
+        show
       }}
     >
       {children}

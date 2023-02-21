@@ -2,16 +2,20 @@ import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 // import { Field, Formik } from "formik";
 import axios from "axios";
-import { CREATE_CARD_API, API_KEY, API_BASE_URL, GET_PUB_KEY,CREATE_PAYMENT_API ,GET_PAYMENT_STATUS_PARAMS} from "../../Api";
+import { CREATE_CARD_API, API_KEY, API_BASE_URL,TRANSFER_ASSET, GET_PUB_KEY,CREATE_PAYMENT_API ,GET_PAYMENT_STATUS_PARAMS} from "../../Api";
 import { Form, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { v4 as uuidv4 } from "uuid";
 import { encrypt ,readKey,createMessage} from "openpgp";
+import { useProvider } from "../context";
 
 export const CardPayment = (props) => {
   const { show, setShow } = props;
 
+  const {setBeneficiary,beneficiary} = useProvider()
   const [payStat,setPayStat] = useState("")
+
+
 
   const handleClose = () => {
     setShow(false);
@@ -134,6 +138,39 @@ console.log(encrypted,"encrypted")
   };
   //ends here
 
+  //transfer api 
+  const transfer = (walletId,_address,_amount)=>{
+
+    let data = {
+      idempotencyKey: uuidv4(),
+      source: {
+        type: "wallet",
+        id: walletId
+      },
+      destination: {
+        type: "blockchain",
+        address: _address,
+        chain: "XLM"
+      },
+      amount: {
+        amount: _amount,
+        currency: "USD"
+      }
+    }
+    axios.post(`${TRANSFER_ASSET}`,data,{
+      headers: {
+          Authorization: `Bearer ${API_KEY}`,
+      },
+  })
+  .then((res)=>{
+    console.log(res,"res transfer")
+    window.alert("transfer successfull")
+
+  })
+  .catch((err)=>{
+    console.log(err,"err")
+  })
+  }
   //create payment
   const CreatePayment = async(e) => {
     e.preventDefault();
@@ -183,10 +220,12 @@ console.log(encrypted,"encrypted")
                 },
             })
               .then((res)=>{
-                    console.log(res,"res")
+                    console.log(res,"response payment api")
                     // setPayStat(res.data.status)
                     if(res.data.data.status==="paid"){
                       console.log("under paid")
+                      console.log(beneficiary,"beneficiary trim")
+                      transfer(res.data.data.merchantWalletId,beneficiary,data.amount)
                       clearInterval(interval)
 
                     }
@@ -197,14 +236,14 @@ console.log(encrypted,"encrypted")
      
               })
               
-            }, 1000);
+            }, 5000);
 
-
-
-           
         })
         .catch((err) => {
             console.log(err, "error")
+        })
+        .finally(()=>{
+          handleClose()
         })
 
     // console.log(data, "data _values");

@@ -20,14 +20,14 @@ import { API_BASE_URL } from "../Api";
 const server = new StellarSdk.Server("https://horizon-testnet.stellar.org/");
 
 export const Home = (props) => {
-    const {setAccountAddress,accountAddress}  = useProvider()
+    const {show,setShow,setAccountAddress,accountAddress,setBeneficiary,beneficiary,accountBalance, setAccountBalance}  = useProvider()
 
-    const [show,setShow] = useState(false)
+    // const [show,setShow] = useState(false)
 
-  const [accountBalance, setAccountBalance] = useState(0);
-  const [anchorAddress, setAnchorAddress] = useState("");
+  // const [accountBalance, setAccountBalance] = useState(0);
+  // const [anchorAddress, setAnchorAddress] = useState("");
 
-  const [beneficiary, setBeneficiary] = useState("");
+  // const [beneficiary, setBeneficiary] = useState("");
 
 
   async function createAccount() {
@@ -64,7 +64,7 @@ export const Home = (props) => {
     const networkUrl = "https://horizon-testnet.stellar.org/";
     const assetCode = "USDC";
     const server = new StellarSdk.Server(networkUrl);
-    const issuingAccount = anchorAddress; // Circle Anchor testnet Address :"GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
+    const issuingAccount = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"; // Circle Anchor testnet Address :"GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5"
 
     const account = await server.loadAccount(accountAddress);
 
@@ -85,7 +85,8 @@ export const Home = (props) => {
 
     const result = await server.submitTransaction(transaction);
     console.log(result);
-    console.log("hurrrraaayyyyy");
+    window.alert("TrustLine Build Successfully")
+    console.log("TrustLine Build Successfully");
 
     return result;
   };
@@ -94,9 +95,7 @@ export const Home = (props) => {
   
 
   return (<>
-    <CardPayment show={show} setShow = {setShow} 
-
-    />
+    <CardPayment show={show} setShow = {setShow} />
 
     <div className="main page-content">
 
@@ -114,14 +113,15 @@ export const Home = (props) => {
                   <div className="row">
                     <div className="col-md-12">
                     <div className="mb-3 gap-10">
-                     <Button onClick={createAccount}>Create Account</Button>
+                     <Button className="me-3" onClick={createAccount}>Create Account</Button>
                       {/* <span>{accountAddress}</span> */}
-                     </div>
-                      <div className="mb-3 gap-10">
-                        <Button className="me-3" onClick={CheckBalance}>
-                          Balance
+                      <Button className="me-3" onClick={BuildTrustLIne}>
+                          Build TrustLine
                         </Button>
-                        <label htmlFor="create">
+                     </div>
+                      {/* <div className="mb-3 gap-10">
+                        
+                        <label  className="me-3" htmlFor="create">
                           <Field
                             disabled={true}
                             //   name="userName"
@@ -131,16 +131,17 @@ export const Home = (props) => {
                             className="form-control"
                           />
                         </label>
-                      </div>
+                        <Button className="me-3" onClick={CheckBalance}>
+                          Balance
+                        </Button>
+                      </div> */}
                      
                      
                       
 
                       <div className="mb-3">
-                        <Button className="me-3" onClick={BuildTrustLIne}>
-                          Build TrustLine
-                        </Button>
-                        <label htmlFor="create">
+                       
+                        {/* <label className="me-3" htmlFor="create">
                           <Field
                             //   disabld={apiStatus.inProgress}
                             //   disabled={true}
@@ -151,7 +152,10 @@ export const Home = (props) => {
                             className="form-control"
                             onChange={(e) => setAnchorAddress(e.target.value)}
                           />
-                        </label>
+                        </label> */}
+                        {/* <Button className="me-3" onClick={BuildTrustLIne}>
+                          Build TrustLine
+                        </Button> */}
                       </div>
                       <div className="mb-3">
                         {/* <Button className="me-3" onClick={BuildTrustLIne}>
@@ -166,10 +170,18 @@ export const Home = (props) => {
                             value={beneficiary}
                             placeholder="Enter Beneficiary Account"
                             className="form-control"
-                            onChange ={(e)=>{setBeneficiary(e.target.value)}}
+                            onChange ={(e)=>{setBeneficiary(e.target.value.trim())}}
                           />
                         </label>
-                     <Button onClick={()=>{setShow(true)}}>Pay With Card</Button>
+                     <Button onClick={()=>{
+                      if(beneficiary){
+                      setShow(true)
+                        
+                      }else{
+                        window.alert("enter benificiary first")
+                      }
+                      }
+                      }>Pay With Card</Button>
 
                       </div>
                       
