@@ -12,6 +12,7 @@ import {
   GET_CIRCLE_ACCOUNT_PRAMS,
 } from "../Api";
 import { useProvider } from "./context";
+import { CreateAccountModal } from "./Modal/CreateAccountModal";
 
 export const WirePayment = (props) => {
   const { setWireAccountId } = useProvider();
@@ -20,35 +21,57 @@ export const WirePayment = (props) => {
   const [trackingId, setTrackingId] = useState("");
 
   const [accStatus, setAccStatus] = useState();
-  const [data,setData] = useState({
-      amount:"",
-      trackRef:"",
-      benificiary:""
-  })
+  const [data, setData] = useState({
+    amount: "",
+    trackRef: "",
+    benificiary: "",
+  });
   const [amount, setAmount] = useState("");
   const [show, setShow] = useState(false);
+  const [show2, setShow2] = useState(false);
 
-  async function createWireAccount() {
+  //========
+  const [data2, setData2] = useState({
+    idempotencyKey: uuidv4(),
+    accountNumber: "12340010",
+    routingNumber: "121000248",
+    name: "Satoshi Nakamoto",
+    city: "Boston",
+    countryCode: "US",
+    address: "100 Money Street",
+    postal: "01234",
+    district: "MA",
+    bankCountryCode: "US",
+    bankName: "SAN FRANCISCO",
+    bankCity: "SAN FRANCISCO",
+    bankAddress: "100 Money Street",
+    bankdistrict: "CA",
+  });
+
+  async function createWireAccount(e) {
+    e.preventDefault()
+
+    console.log(data2,"data2-=-=-=")
     let data = {
       idempotencyKey: uuidv4(),
-      accountNumber: "12340010",
-      routingNumber: "121000248",
+      accountNumber: data2.accountNumber,
+      routingNumber: data2.routingNumber,
       billingDetails: {
-        name: "Satoshi Nakamoto",
-        city: "Boston",
-        country: "US",
-        line1: "100 Money Street",
-        postalCode: "01234",
+        name: data2.name,
+        city: data2.city,
+        country: data2.countryCode,
+        line1: data2.address,
+        postalCode: data2.postal,
         line2: "Suite 1",
-        district: "MA",
+        district: data2.district,
       },
       bankAddress: {
-        country: "US",
-        bankName: "SAN FRANCISCO",
-        city: "SAN FRANCISCO",
-        line1: "100 Money Street",
+        country: data2.bankCountryCode,
+        bankName: data2.bankName,
+        city: data2.bankCity,
+        line1: data2.bankAddress,
         line2: "Suite 1",
-        district: "CA",
+        district: data2.bankdistrict,
       },
     };
     // console.log(newWireAccount);
@@ -70,6 +93,7 @@ export const WirePayment = (props) => {
         setWireAccountId(res.data.data.id);
         setTrackingId(res.data.data.trackingRef);
         await getWireInstruction(res.data.data.id);
+        setShow2(false);
       })
       .catch((err) => {
         console.log(err, "err");
@@ -148,9 +172,16 @@ export const WirePayment = (props) => {
   //   console.log(data,"data--wire pay side")
   return (
     <>
+      <CreateAccountModal
+        data={data2}
+        setData={setData2}
+        show={show2}
+        setShow={setShow2}
+        createWireAccount={createWireAccount}
+      />
       <WirePaymentModal
-      data={data}
-      setData={setData}
+        data={data}
+        setData={setData}
         setAmount={setAmount}
         amount={amount}
         trackingId={trackingId}
@@ -177,7 +208,7 @@ export const WirePayment = (props) => {
                       {/* <div>WirePayment</div> */}
 
                       <div className="mb-3 gap-10">
-                        <Button className="me-3" onClick={createWireAccount}>
+                        <Button className="me-3" onClick={() => setShow2(true)}>
                           Create Account
                         </Button>
                         <label className="me-3" htmlFor="Beneficiary Account">
