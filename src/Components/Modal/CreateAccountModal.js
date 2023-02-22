@@ -26,7 +26,7 @@ export const CreateAccountModal = (props) => {
         onHide={handleClose}
       >
         <Modal.Header closeButton>
-          <Modal.Title>{"Create Account"}</Modal.Title>
+          <Modal.Title>{"Transfer"}</Modal.Title>
         </Modal.Header>
         <Form onSubmit={createWireAccount}>
           <Modal.Body className={""}>
@@ -245,7 +245,7 @@ export const CreateAccountModal = (props) => {
               className={"style.createFeatureBtn"}
               // disabled={editItem ? false : formik.isSubmitting || !formik.dirty || !formik.isValid}
             >
-              {"Create Wire Account"}
+              {"Config Your Bank"}
             </Button>
           </Modal.Footer>
         </Form>

@@ -14,10 +14,11 @@ const CREATE_WIRE_ACCOUNT = getApiUrl("/v1/businessAccount/banks/wires");
 const GET_WIRE_ACC_STATUS_WITH_ID_PARAMS = getApiUrl("/v1/businessAccount/banks/wires");
 const GET_CIRCLE_ACCOUNT_PRAMS = getApiUrl("/v1/businessAccount/banks/wires");
 const CREATE_WIRE_MOCK_PAYMENT_API = getApiUrl("/v1/mocks/payments/wire");
-
+const GET_WIRE_TRANSFER_STATUS_PARAMS = getApiUrl("/v1/transfers");
 
 
 export {
+    GET_WIRE_TRANSFER_STATUS_PARAMS,
     CREATE_WIRE_MOCK_PAYMENT_API,
     GET_CIRCLE_ACCOUNT_PRAMS,
     GET_WIRE_ACC_STATUS_WITH_ID_PARAMS,

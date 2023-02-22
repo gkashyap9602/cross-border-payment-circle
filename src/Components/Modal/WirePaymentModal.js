@@ -1,15 +1,11 @@
-import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 // import { Field, Formik } from "formik";
-import axios from "axios";
-import { Form, Row, Col } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { v4 as uuidv4 } from "uuid";
-import { encrypt, readKey, createMessage } from "openpgp";
-import { useProvider } from "../context";
+
 
 export const WirePaymentModal = (props) => {
-  const {data,setData, amount,setAmount,show, setShow, sendWireTransaction,trackingId,setTrackingId,cirecleAccountNumber,setCircleAccountNumber} = props;
+  const {benificiaryDetails,setBeneficiaryDetails,data,setData,show, setShow, sendWireTransaction,trackingId,setTrackingId} = props;
 
   const updateData = (e) => {
     setData({
@@ -42,9 +38,11 @@ export const WirePaymentModal = (props) => {
             <Form.Group>
               <Form.Label> Amount</Form.Label>
               <Form.Control
-                value={data.amount}
-                // onChange={(e)=>{setAmount(e.target.value)}}
-                onChange={updateData}
+                 disabled= {true}
+                // value={data.amount}
+                value = {benificiaryDetails.amount}
+                onChange={(e)=>{setBeneficiaryDetails({...benificiaryDetails,amount:e.target.value})}}
+                // onChange={updateData}
                 name="amount"
                 type="text"
                 placeholder="Enter Amount"
