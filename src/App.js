@@ -9,6 +9,7 @@ import { ProviderApp } from './Components/context';
 // import { ToastContainer } from 'react-toastify';
 // import "react-toastify/dist/ReactToastify.css";
 
+import { Payout } from './Components/Payout';
 import {WirePayment} from "./Components/WirePayment"
 
 function App() {
@@ -25,6 +26,8 @@ function App() {
     <Routes>
       <Route exact path='/' element={[<Header  />,<Home />,<Footer/>]} />
       <Route path='/wire' element={[<Header  />,<WirePayment />,<Footer/>]} />
+      <Route path='/payout' element={[<Header  />,<Payout />,<Footer/>]} />
+
 
     </Routes>
   </Router>

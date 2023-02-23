@@ -11,10 +11,13 @@ export const ProviderApp = ({ children }) => {
   const [show,setShow] = useState(false)
 
   const [WireAccountId,setWireAccountId] = useState("")
+  const [payoutId,setPayoutId] = useState("")
 
   return (
     <GlobalNftContext.Provider
       value={{
+        setPayoutId,
+        payoutId,
         data,
         setData,
         accountAddress,

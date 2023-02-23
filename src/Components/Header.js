@@ -3,7 +3,7 @@ import { useProvider } from "./context";
 
 export function Header(props) {
  
-  const {accountAddress,accountBalance,WireAccountId} = useProvider()
+  const {accountAddress,accountBalance,WireAccountId,payoutId} = useProvider()
   
   let {isLogin} = props
   let result  = true
@@ -38,7 +38,11 @@ export function Header(props) {
                       {accountAddress?
            <span> <strong>Steller Account</strong>:- {accountAddress}   <span> <strong> Balance</strong> :- {accountBalance}</span></span>
            :
-           <span> <strong>Wire Account Id</strong>:- {WireAccountId}   </span>
+           
+           ( WireAccountId? <span> <strong>Wire Account Id</strong>:- {WireAccountId}   </span>:
+           <span> <strong>Payout Id</strong>:- {payoutId}   </span>
+           
+           )
            
            }
          
