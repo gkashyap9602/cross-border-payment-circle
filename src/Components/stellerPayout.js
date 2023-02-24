@@ -3,12 +3,26 @@ import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { Button, Card } from "react-bootstrap";
 import { Field, Form, Formik } from "formik";
-import { CREATE_PAYOUT_WIRE, API_KEY ,GET_WIRE_PAYOUT_STATUS_WITH_ID_PARAMS} from "../Api";
+import {GET_WIRE_CHIAN_PAYOUT_STATUS_WITH_ID_PARAMS,CREATE_PAYOUT_WIRE_CHAIN,GET_CIRCLE_CHAIN_WALLET_BALANCE_WALLETID_PARAMS, CREATE_PAYOUT_WIRE, API_KEY ,CREATE_CIRCLE_CHAIN_WALLET,CREATE_CIRCLE_CHAIN_ADDRESS_WALLET_ID_PARAMS} from "../Api";
 import { useProvider } from "./context";
 
 export const StellerPayout = () => {
   const { stellerDetails,setStellerDetails} = useProvider();
 
+  const [circleChainWalletId,setCircleChainWalletId] = useState("")
+  const [circleStellerAccount,setCircleStellerAccount] = useState("")
+  const [balanceChainWalletId,setBalanceChainWalletId] = useState("")
+  const [circleChainWalletBalance,setCircleChainWalletBalance] = useState()
+
+  const [payoutFromCircleWalletId,setPayoutFromCircleWalletId] = useState()
+
+  const [benificiary, setBenificiary] = useState({
+    amount: "",
+    benificiaryId: "",
+  });
+  const [payoutId,setPayoutId] = useState("")
+  const [statusPayoutId,setStatusPayoutId] = useState("")
+  const [payoutStatus,setPayoutStatus] = useState()
 //   const [benificiary, setBenificiary] = useState({
 //     amount: "",
 //     benificiaryId: "",
@@ -20,9 +34,9 @@ export const StellerPayout = () => {
 
 //check steller account balance 
 
-const CheckBalance = async (_accountAddress)=> {
+const CheckBalance = async ()=> {
     const CheckBalance = await axios.get(
-      `https://horizon-testnet.stellar.org/accounts/${_accountAddress}`
+      `https://horizon-testnet.stellar.org/accounts/${stellerDetails.stellerAccount}`
     );
     console.log(CheckBalance,"Steller Acc check Balance");
     setStellerDetails({
@@ -35,42 +49,153 @@ const CheckBalance = async (_accountAddress)=> {
 
 
   //
-//   async function createWirePayout(e) {
-//     e.preventDefault()
+  async function createCircleWalletAndAddress(e) {
+    e.preventDefault()
 
-//     let data = {
-//       idempotencyKey: uuidv4(),
-//       destination: {
-//         type: "wire",
-//         id: benificiary.benificiaryId,
-//       },
-//       amount: {
-//         amount: benificiary.amount,
-//         currency: "USD",
-//       },
-//     };
-//     await axios.post(`${CREATE_PAYOUT_WIRE}`, data, {
-//       headers: {
-//         "Content-Type": "application/json",
-//         Accept: "application/json",
-//         Authorization: `Bearer ${API_KEY}`,
-//       },
-//     })
-//     .then((res)=>{
-//      console.log(res,"response create payout side ")
-//      window.alert("Payout Successfull Check Status")
-//      setPayoutId(res.data.data.id)
-//      setCircleWalletId(res.data.data.sourceWalletId)
-//     })
-//     .catch((err)=>{
-//      console.log(err,"error create payout side ")
+    let uniqName = uuidv4()
+    let data = {
+      idempotencyKey: uuidv4(),
+      description: `Chain Wallet ${uniqName}`,
+    };
+    await axios.post(`${CREATE_CIRCLE_CHAIN_WALLET}`, data, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${API_KEY}`,
+      },
+    })
+    .then((res)=>{
+     console.log(res,"response create circle chain Wallet side ")
+     setCircleChainWalletId(res.data.data.walletId)
+       
+     if(res.data.data.walletId){
+
+        let formdata = {
+            idempotencyKey: uuidv4(),
+            currency: "USD",
+            chain: "ETH"
+        }
+        axios.post(`${CREATE_CIRCLE_CHAIN_ADDRESS_WALLET_ID_PARAMS}/${res.data.data.walletId}/addresses`, formdata, {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: `Bearer ${API_KEY}`,
+            },
+          })
+          .then((res)=>{
+            console.log(res,"response create circle steller Acc side")
+            window.alert("account Created Successfully")
+            setCircleStellerAccount(res.data.data.address)
+
+          }).catch((err)=>{
+            console.log(err,"error create circle steller acc side")
+          })
+     }
+     
+    })
+    .catch((err)=>{
+     console.log(err,"error create payout side ")
         
-//     })
+    })
     
-//   }
+  }
   //ends
 
-  //createWirePayout
+  async function getCircleChainWalletBalance(e) {
+    e.preventDefault()
+
+    await axios.get(`${GET_CIRCLE_CHAIN_WALLET_BALANCE_WALLETID_PARAMS}/${balanceChainWalletId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${API_KEY}`,
+      },
+    })
+    .then((res)=>{
+     console.log(res,"response  get circle chain wallet balance side ")
+     console.log(res.data.data.balances,"response  get circle chain wallet balance side ")
+
+     if(res.data.data.balances.length>0){
+        let usdc = res.data.data.balances.find((val)=>val.currency ==="USD")
+
+            setCircleChainWalletBalance(usdc?.amount? usdc.amount:0)
+
+     }else{
+        setCircleChainWalletBalance(0)
+     }
+     
+    })
+    .catch((err)=>{
+     console.log(err,"error payout status side ")
+        
+    })
+    
+  };
+
+  //dd
+
+  async function createWirePayout(e) {
+    e.preventDefault()
+
+    let data = {
+      idempotencyKey: uuidv4(),
+      destination: {
+        type: "wire",
+        id: benificiary.benificiaryId,
+      },
+      amount: {
+        amount: benificiary.amount,
+        currency: "USD",
+      },
+      metadata: {
+        beneficiaryEmail: "satoshi@circle.com"
+   },
+   source: {
+    type: "wallet",
+    id: payoutFromCircleWalletId
+},
+    };
+    await axios.post(`${CREATE_PAYOUT_WIRE_CHAIN}`, data, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${API_KEY}`,
+      },
+    })
+    .then((res)=>{
+     console.log(res,"response create payout side ")
+     window.alert("Payout Successfull Check Status")
+     setPayoutId(res.data.data.id)
+    })
+    .catch((err)=>{
+     console.log(err,"error create payout side ")
+        
+    })
+    
+  }
+
+  async function checkPayoutStatus(e) {
+    e.preventDefault()
+
+    await axios.get(`${GET_WIRE_CHIAN_PAYOUT_STATUS_WITH_ID_PARAMS}/${statusPayoutId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${API_KEY}`,
+      },
+    })
+    .then((res)=>{
+     console.log(res,"response  payout status side ")
+     setPayoutStatus(res.data.data.status)
+    })
+    .catch((err)=>{
+     console.log(err,"error payout status side ")
+        
+    })
+    
+  }
+  //ends
+  //ends
 //   async function checkPayoutStatus(e) {
 //     e.preventDefault()
 
@@ -93,6 +218,7 @@ const CheckBalance = async (_accountAddress)=> {
 //   }
   //ends
 
+  console.log(circleChainWalletBalance,"circleChainWalletBalance")
   return (
     <>
       <div className="main page-content">
@@ -151,7 +277,7 @@ const CheckBalance = async (_accountAddress)=> {
                       <div className="mb-3 gap-10">
                         <Button
                           className="me-3"
-                        //   onClick={checkPayoutStatus}
+                          onClick={createCircleWalletAndAddress}
                         >
                           Create Circle Steller Account
                         </Button>
@@ -159,30 +285,33 @@ const CheckBalance = async (_accountAddress)=> {
                           <Field
                               disabled={true}
                             //   disabled={true}
-                            name="circleSteller"
+                            name="circleChainWalletId"
                             //   id="username"
-                            // value={id}
-                            placeholder="Circle Steller Account"
-                            className="form-control"
-                            onChange={(e) => {
-                                // setId(e.target.value.trim());
-                            }}
-                          />
-                        </label>
-                        <label className="me-3" htmlFor="acc id">
-                          <Field
-                              disabled={true}
-                            //   disabled={true}
-                            name="circleChainWallet"
-                            //   id="username"
-                            // value={id}
+                            value={circleChainWalletId}
                             placeholder="Circle Chain Wallet Id"
                             className="form-control"
                             onChange={(e) => {
-                                // setId(e.target.value.trim());
+                                setCircleChainWalletId(e.target.value.trim());
                             }}
                           />
                         </label>
+
+                        <span> <strong>Circle Steller Account</strong>:-{circleStellerAccount}</span>
+                        {/* <label className="me-3" htmlFor="acc id">
+                          <Field
+                              disabled={true}
+                            //   disabled={true}
+                            name="circleStellerAccount"
+                            //   id="username"
+                            value={circleStellerAccount}
+                            placeholder="Circle Steller Account"
+                            className="form-control"
+                            onChange={(e) => {
+                                setCircleStellerAccount(e.target.value.trim());
+                            }}
+                          />
+                        </label> */}
+                        
                         {/* <span>{payoutStatus}</span> */}
                       </div>
                       
@@ -256,7 +385,7 @@ const CheckBalance = async (_accountAddress)=> {
                         <Button
                           className="me-3"
                         //   onClick={(e)=>{
-                        //     if(benificiary.benificiaryId && benificiary.amount){
+                        //     if(benificiary.benificiaryId && benificiary.amount && payoutFromCircleWalletId){
                         //         createWirePayout(e)
                         //     }else{
                         //         window.alert("Enter benificiary details first")
@@ -277,27 +406,33 @@ const CheckBalance = async (_accountAddress)=> {
                             //   disabled={true}
                             name="circleChainId"
                             //   id="username"
-                            // value={id}
+                            value={balanceChainWalletId}
                             placeholder="Enter Circle Chain Wallet Id "
                             className="form-control"
-                            // onChange={(e) => {
-                            //     setId(e.target.value.trim());
-                            // }}
+                            onChange={(e) => {
+                                setBalanceChainWalletId(e.target.value.trim());
+                            }}
                           />
                         </label>
                         <Button
                           className="me-3"
-                        //   onClick={checkPayoutStatus}
+                          onClick={(e)=>{
+                            if(balanceChainWalletId){
+                                getCircleChainWalletBalance(e)
+                            }else{
+                                window.alert("enter circle chain wallet id first")
+                            }
+                          }}
                         >
                           Get Circle Chain Wallet Balance 
                         </Button>
                         <label className="me-3" htmlFor="acc id">
                           <Field
+                              disabled={true}
                             //   disabled={true}
-                            //   disabled={true}
-                            name="circleChainBalance"
+                            name="circleChainWalletBalance"
                             //   id="username"
-                            // value={id}
+                            value={`${circleChainWalletBalance} USD`}
                             placeholder="circle Chain USDC Balance"
                             className="form-control"
                             // onChange={(e) => {
@@ -333,12 +468,12 @@ const CheckBalance = async (_accountAddress)=> {
                             // value={benificiaryDetails.benificiary}
                             placeholder="Enter Wire Bank Id "
                             className="form-control"
-                            // onChange={(e) => {
-                            //   setBenificiary({
-                            //     ...benificiary,
-                            //     benificiaryId: e.target.value,
-                            //   });
-                            // }}
+                            onChange={(e) => {
+                              setBenificiary({
+                                ...benificiary,
+                                benificiaryId: e.target.value,
+                              });
+                            }}
                           />
                         </label>
                         <label className="me-3" htmlFor="amount">
@@ -350,65 +485,71 @@ const CheckBalance = async (_accountAddress)=> {
                             // value={benificiaryDetails.amount}
                             placeholder="Enter amount"
                             className="form-control"
-                            // onChange={(e) => {
-                            //   setBenificiary({
-                            //     ...benificiary,
-                            //     amount: e.target.value,
-                            //   });
-                            // }}
+                            onChange={(e) => {
+                              setBenificiary({
+                                ...benificiary,
+                                amount: e.target.value,
+                              });
+                            }}
                           />
                         </label>
                         <label className="me-3" htmlFor="Circle Wallet Id">
                           <Field
-                            disabled={true}
+                            // disabled={true}
                             //   disabled={true}
                             //   name="userName"
                             //   id="username"
-                            // value={circleWalletId}
+                            value={payoutFromCircleWalletId}
                             placeholder="Enter Circle Chain Wallet Id"
                             className="form-control"
-                            // onChange ={(e)=>{setBeneficiary(e.target.value.trim())}}
+                            onChange ={(e)=>{setPayoutFromCircleWalletId(e.target.value.trim())}}
                           />
                         </label>
                         <Button
                           className="me-3"
-                        //   onClick={(e)=>{
-                        //     if(benificiary.benificiaryId && benificiary.amount){
-                        //         createWirePayout(e)
-                        //     }else{
-                        //         window.alert("Enter benificiary details first")
-                        //     }
-                        //   }}
+                          onClick={(e)=>{
+                            if(benificiary.benificiaryId && benificiary.amount && payoutFromCircleWalletId){
+                                createWirePayout(e)
+                            }else{
+                                window.alert("Enter benificiary details first")
+                            }
+                          }}
                         >
                           Payout
                         </Button>
 
                        
-                        {/* <span>{accountId}</span> */}
+                        <span>{payoutId}</span>
                       </div>
                       <div className="mb-3 gap-10">
                       <label className="me-3" htmlFor="acc id">
                           <Field
                             //   disabled={true}
                             //   disabled={true}
-                            name="payoutId"
+                            name="statusPayoutId"
                             //   id="username"
-                            // value={id}
+                            value={statusPayoutId}
                             placeholder="Enter Payout Id "
                             className="form-control"
-                            // onChange={(e) => {
-                            //     setId(e.target.value.trim());
-                            // }}
+                            onChange={(e) => {
+                                setStatusPayoutId(e.target.value.trim());
+                            }}
                           />
                         </label>
                         <Button
                           className="me-3"
-                        //   onClick={checkPayoutStatus}
+                          onClick={(e)=>{
+                            if(statusPayoutId){
+                                checkPayoutStatus(e)
+                            }else{
+                                window.alert("enter status payout id first ")
+                            }
+                          }}
                         >
                           Check Payout status
                         </Button>
                         
-                        {/* <span>{payoutStatus}</span> */}
+                        <span>{payoutStatus}</span>
                       </div>
                       {/* <div className="mb-3 gap-10">
                         <Button className="me-3" onClick={getWireInstruction}>

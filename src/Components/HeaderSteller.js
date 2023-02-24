@@ -47,10 +47,10 @@ export function HeaderSteller(props) {
               {stellerDetails.stellerAccount ? (
                 <span>
                   {" "}
-                  <strong> Steller Account</strong>:- {accountAddress}{" "}
+                  <strong> Steller Account</strong>:- {stellerDetails.stellerAccount}{" "}
                   <span>
                     {" "}
-                    <strong> Balance</strong> :- {accountBalance}
+                    <strong> Balance</strong> :-USDC {stellerDetails.stellerBalance}
                   </span>
                 </span>
               ) : (

@@ -40,7 +40,7 @@ export function Header(props) {
            :
            
            ( WireAccountId? <span> <strong>Wire Account Id</strong>:- {WireAccountId}   </span>:
-           <span> <strong>Payout Id</strong>:- {payoutId}   </span>
+           <span> <strong>Wire Acc Id</strong>:- {payoutId}   </span>
            
            )
            
