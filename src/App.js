@@ -11,6 +11,8 @@ import { ProviderApp } from './Components/context';
 
 import { Payout } from './Components/Payout';
 import {WirePayment} from "./Components/WirePayment"
+import { StellerPayout } from './Components/stellerPayout';
+import { HeaderSteller } from './Components/HeaderSteller';
 
 function App() {
 
@@ -27,6 +29,8 @@ function App() {
       <Route exact path='/' element={[<Header  />,<Home />,<Footer/>]} />
       <Route path='/wire' element={[<Header  />,<WirePayment />,<Footer/>]} />
       <Route path='/payout' element={[<Header  />,<Payout />,<Footer/>]} />
+      <Route path='/stellerPayout' element={[<HeaderSteller  />,<StellerPayout />,<Footer/>]} />
+
 
 
     </Routes>
