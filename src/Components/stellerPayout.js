@@ -525,7 +525,6 @@ const CheckBalance = async ()=> {
                       <label className="me-3" htmlFor="acc id">
                           <Field
                             //   disabled={true}
-                            //   disabled={true}
                             name="statusPayoutId"
                             //   id="username"
                             value={statusPayoutId}
